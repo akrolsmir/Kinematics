@@ -3,6 +3,8 @@ package kinematics;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.media.opengl.GL2;
+
 import org.ejml.data.DenseMatrix64F;
 
 public class Arm {
@@ -17,9 +19,9 @@ public class Arm {
 		numSegments = segments.size();
 	}
 	
-	public void draw(){
+	public void draw(GL2 gl){
 		for(Joint j : segments){
-			j.draw();
+			j.draw(gl);
 		}
 	}
 	
