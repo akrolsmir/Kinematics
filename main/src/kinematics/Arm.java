@@ -28,6 +28,16 @@ public class Arm {
 		}
 	}
 	
+	// Update the position of every joint that's not the first
+	public void updateJointPos() {
+		Point pos = null;
+		for(Joint j : segments){
+			j.pos = pos == null ? j.pos : pos;
+			j.updateEnd();
+			pos = j.end;
+		}
+	}
+	
 	/**
 	 * Computes Pseudoinverse J+ = J^T(JJ^T)^-1
 	 * Refer to http://math.ucsd.edu/~sbuss/ResearchWeb/ikmethods/iksurvey.pdf
