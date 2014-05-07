@@ -3,6 +3,7 @@ package kinematics;
 import javax.media.opengl.GL2;
 
 import org.ejml.data.DenseMatrix64F;
+import org.ejml.ops.CommonOps;
 
 public class BallJoint extends Joint {
 	
@@ -10,6 +11,8 @@ public class BallJoint extends Joint {
 		this.length = length;
 		this.pos = pos;
 		this.rot = rot;
+		this.rotMatrix = CommonOps.identity(3);
+		//CommonOps.add
 	}
 
 	@Override
