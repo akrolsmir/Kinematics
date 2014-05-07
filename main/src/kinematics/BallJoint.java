@@ -10,6 +10,7 @@ public class BallJoint extends Joint {
 		this.length = length;
 		this.pos = pos;
 		this.rot = rot;
+		updateEnd();
 	}
 
 	@Override
@@ -19,18 +20,25 @@ public class BallJoint extends Joint {
 				{pos.getY(),-pos.getX(),0}};
 		return new DenseMatrix64F(pos_array);
 	}
+	
+	@Override
+	// Calculate endpoint with Rodriguez formula
+	public void updateEnd() {
+		Point x = new Point(length, 0, 0);
+		double theta = rot.magnitude();
+		if (theta == 0.0) {
+			end = x;
+		} else {
+			Point norm =  rot.normalize();
+			end = norm.multiply((norm.dotProduct(x)))
+					.add(norm.crossProduct(x).multiply(Math.sin(theta)))
+					.subtract(norm.crossProduct(norm.crossProduct(x)).multiply(Math.cos(theta)));
+		}
+		end = pos.add(end);
+	}
 
 	@Override
 	public void draw(GL2 gl) {
-		// Calculate endpoint with Rodriguez formula
-		Point x = new Point(length, 0, 0);
-		double theta = rot.magnitude();
-		Point norm =  rot.normalize();
-		Point end = norm.multiply((norm.dotProduct(x)))
-				.add(norm.crossProduct(x).multiply(Math.sin(theta)))
-				.subtract(norm.crossProduct(norm.crossProduct(x)).multiply(Math.cos(theta)));
-		end = pos.add(end);
-		
 		// Draw a line between pos and end
 		gl.glBegin(GL2.GL_LINES);
 		gl.glVertex3d(pos.getX(), pos.getY(), pos.getZ());
