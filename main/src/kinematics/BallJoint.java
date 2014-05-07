@@ -14,7 +14,10 @@ public class BallJoint extends Joint {
 
 	@Override
 	public DenseMatrix64F getJacobian(){
-		return new DenseMatrix64F(1,1);
+		double[][] pos_array = new double[][]{{0,pos.getZ(),-pos.getY()},
+				{-pos.getZ(),0,pos.getX()},
+				{pos.getY(),-pos.getX(),0}};
+		return new DenseMatrix64F(pos_array);
 	}
 
 	@Override

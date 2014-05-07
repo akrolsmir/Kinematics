@@ -6,6 +6,9 @@ import java.util.List;
 import javax.media.opengl.GL2;
 
 import org.ejml.data.DenseMatrix64F;
+import org.ejml.factory.DecompositionFactory;
+import org.ejml.factory.SingularValueDecomposition;
+import org.ejml.ops.CommonOps;
 
 public class Arm {
 	
@@ -25,6 +28,34 @@ public class Arm {
 		}
 	}
 	
+	/**
+	 * Computes Pseudoinverse J+ = J^T(JJ^T)^-1
+	 * Refer to http://math.ucsd.edu/~sbuss/ResearchWeb/ikmethods/iksurvey.pdf
+	 * @param A
+	 * @return
+	 */
+	public DenseMatrix64F invertMatrix(DenseMatrix64F A){
+		/*
+		SingularValueDecomposition<DenseMatrix64F> svd = DecompositionFactory.svd(A.numRows, A.numCols,true,true,false);
+		if(!svd.decompose(A)){
+			System.err.println("Decomposition failed");
+			System.exit(0);
+		}
+		DenseMatrix64F U = svd.getU(null,false);
+		DenseMatrix64F W = svd.getW(null);
+		DenseMatrix64F V = svd.getV(null,false);
+		*/
+		
+		//holy shit this library
+		DenseMatrix64F ATrans = new DenseMatrix64F(A.numCols, A.numRows);
+		CommonOps.transpose(A,ATrans);
+		DenseMatrix64F result = new DenseMatrix64F(A.numCols, A.numRows);
+		CommonOps.mult(A,ATrans,result);
+		CommonOps.invert(result,result);
+		CommonOps.mult(ATrans,result,result);
+		return result;
+	}
+	
 	public DenseMatrix64F getJacobian(){
 		//TODO
 		return new DenseMatrix64F(numSegments,numSegments);
@@ -36,10 +67,17 @@ public class Arm {
 	 */
 	public void doStep(double perturb){
 		//TODO
+		//PROBABLY DON'T NEED THIS
 	}
 	
 	public void solve(Point p){
-		//TODO
+		/**
+		 * While there is some error
+		 * do stuff
+		 * plz
+		 * plz
+		 * plz
+		 */
 	}
 
 }
