@@ -54,7 +54,17 @@ public class BallJoint extends Joint {
 	@Override
 	public void draw(GL2 gl) {
 		// Draw a line between pos and end
+		gl.glLineWidth(2);
+		gl.glColor4f( 0.4f, 0.5f, 0.9f, 1);
 		gl.glBegin(GL2.GL_LINES);
+		gl.glVertex3d(pos.getX(), pos.getY(), pos.getZ());
+		gl.glVertex3d(end.getX(), end.getY(), end.getZ());
+		gl.glEnd();
+		
+		gl.glEnable(GL2.GL_POINT_SMOOTH);
+		gl.glPointSize(5);
+		gl.glColor4f( 0.9f, 0.9f, 0.4f, 1.0f );
+		gl.glBegin(GL2.GL_POINTS);
 		gl.glVertex3d(pos.getX(), pos.getY(), pos.getZ());
 		gl.glVertex3d(end.getX(), end.getY(), end.getZ());
 		gl.glEnd();
