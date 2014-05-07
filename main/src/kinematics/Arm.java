@@ -102,9 +102,15 @@ public class Arm {
 	
 	public void solve(Point goal){
 		updateJointPos();
-		double epsilon = .01;
-		double k = .01;
+		double epsilon = .1;
+		double k = .1;
+		int max_iter = 100;
+		int curr = 0;
 		while(segments.get(numSegments-1).end.subtract(goal).magnitude() > epsilon){
+			if(curr > max_iter){
+				break;
+			}
+			curr++;
 			DenseMatrix64F rots = invertMatrix(getJacobian());
 			CommonOps.scale(k, rots);
 			Point diff = segments.get(numSegments-1).end.subtract(goal);

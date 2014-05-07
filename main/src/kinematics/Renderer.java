@@ -16,6 +16,8 @@ import com.jogamp.opengl.util.Animator;
  */
 public class Renderer implements GLEventListener {
 	
+	static double angle = 0.0;
+	
 	Joint ballJoint = new BallJoint(1, new Point(0, 0, 0), new Point(1, 1, 1));
 	Arm arm = new Arm(Arrays.asList(new Joint[]{
 			new BallJoint(1, new Point(0, 0, 0), new Point(0, 0, 0)),
@@ -33,8 +35,10 @@ public class Renderer implements GLEventListener {
 		gl.glTranslatef(0.0f, 0.0f, -5.0f);
  
 		arm.updateJointPos();
-		arm.solve(new Point(1,1,1));
+		arm.solve(new Point(Math.cos(angle),Math.sin(angle),1));
 		arm.draw(gl);
+		System.out.println(angle);
+		angle += 0.001;
 	}
  
 	@Override
