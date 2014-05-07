@@ -28,6 +28,17 @@ public class Arm {
 		}
 	}
 	
+	// Update the position of every joint that's not the first
+	public void updateJointPos() {
+		segments.get(0).updateEnd(null);
+		for(int i = 1; i < numSegments; i++){
+			Joint j = segments.get(i);
+			Joint prev = segments.get(i - 1);
+			j.pos = prev.end;
+			j.updateEnd(prev.pos);
+		}
+	}
+	
 	/**
 	 * Computes Pseudoinverse J+ = J^T(JJ^T)^-1
 	 * Refer to http://math.ucsd.edu/~sbuss/ResearchWeb/ikmethods/iksurvey.pdf
@@ -57,8 +68,17 @@ public class Arm {
 	}
 	
 	public DenseMatrix64F getJacobian(){
-		//TODO
-		return new DenseMatrix64F(numSegments,numSegments);
+		//DenseMatrix64 totalRot = CommonOps.identity(0);
+		//Assume there is more than one segment
+		DenseMatrix64F currRot = segments.get(0).getJacobian();
+		DenseMatrix64F totalRot = currRot.copy();
+		for(int i = 1; i < numSegments; i++){
+			DenseMatrix64F temp = segments.get(i).rotMatrix;
+			CommonOps.mult(currRot,temp,currRot);
+			CommonOps.insert(currRot, totalRot, 3*i,3*i);
+		}
+		
+		return totalRot;
 	}
 	
 	/**

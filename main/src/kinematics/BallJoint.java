@@ -12,7 +12,19 @@ public class BallJoint extends Joint {
 		this.pos = pos;
 		this.rot = rot;
 		this.rotMatrix = CommonOps.identity(3);
+		Point rotNorm = rot.normalize();
 		//CommonOps.add
+		double[][] rot_array = new double[][]{{0,-rotNorm.getZ(),rotNorm.getY()},
+				{rotNorm.getZ(),0,-rotNorm.getX()},
+				{-rotNorm.getY(),rotNorm.getX(),0}};
+		DenseMatrix64F temp = new DenseMatrix64F(rot_array);
+		DenseMatrix64F temp1 = new DenseMatrix64F(rot_array);
+		CommonOps.scale(Math.sin(rot.magnitude()), temp1);
+		CommonOps.add(rotMatrix, temp1, rotMatrix);
+		CommonOps.mult(temp, temp, temp);
+		CommonOps.scale(1-Math.cos(rot.magnitude()), temp);
+		CommonOps.add(rotMatrix, temp, rotMatrix);
+		
 	}
 
 	@Override
@@ -22,18 +34,25 @@ public class BallJoint extends Joint {
 				{pos.getY(),-pos.getX(),0}};
 		return new DenseMatrix64F(pos_array);
 	}
+	
+	@Override
+	// Calculate endpoint with Rodriguez formula
+	public void updateEnd(Point prevPos) {
+		Point x = prevPos == null ? new Point(length, 0, 0) : pos.subtract(prevPos);
+		double theta = rot.magnitude();
+		if (theta == 0.0) {
+			end = x;
+		} else {
+			Point norm =  rot.normalize();
+			end = norm.multiply((norm.dotProduct(x)))
+					.add(norm.crossProduct(x).multiply(Math.sin(theta)))
+					.subtract(norm.crossProduct(norm.crossProduct(x)).multiply(Math.cos(theta)));
+		}
+		end = pos.add(end);
+	}
 
 	@Override
 	public void draw(GL2 gl) {
-		// Calculate endpoint with Rodriguez formula
-		Point x = new Point(length, 0, 0);
-		double theta = rot.magnitude();
-		Point norm =  rot.normalize();
-		Point end = norm.multiply((norm.dotProduct(x)))
-				.add(norm.crossProduct(x).multiply(Math.sin(theta)))
-				.subtract(norm.crossProduct(norm.crossProduct(x)).multiply(Math.cos(theta)));
-		end = pos.add(end);
-		
 		// Draw a line between pos and end
 		gl.glBegin(GL2.GL_LINES);
 		gl.glVertex3d(pos.getX(), pos.getY(), pos.getZ());

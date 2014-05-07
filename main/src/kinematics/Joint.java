@@ -7,15 +7,17 @@ import org.ejml.ops.CommonOps;
 
 public abstract class Joint {
 	
-	protected Point pos;
-	protected Point rot;
+	public Point pos, end;
+	public Point rot;
 	// protected double theta; //angle = rot.magnitude()
-	protected double length;
-	protected DenseMatrix64F rotMatrix;
+	public DenseMatrix64F rotMatrix;
+	public double length;
 	
 	public abstract DenseMatrix64F getJacobian();
 	
 	public abstract void draw(GL2 gl);
+	
+	public abstract void updateEnd(Point prevPos);
 	
 	public void setAngle(double angle){
 //		theta = angle;
