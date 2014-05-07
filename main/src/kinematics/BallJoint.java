@@ -19,11 +19,13 @@ public class BallJoint extends Joint {
 				{-rotNorm.getY(),rotNorm.getX(),0}};
 		DenseMatrix64F temp = new DenseMatrix64F(rot_array);
 		DenseMatrix64F temp1 = new DenseMatrix64F(rot_array);
+		DenseMatrix64F temp2 = new DenseMatrix64F(rot_array);
+		DenseMatrix64F temp3 = new DenseMatrix64F(rot_array);
 		CommonOps.scale(Math.sin(rot.magnitude()), temp1);
-		CommonOps.add(rotMatrix, temp1, rotMatrix);
-		CommonOps.mult(temp, temp, temp);
-		CommonOps.scale(1-Math.cos(rot.magnitude()), temp);
-		CommonOps.add(rotMatrix, temp, rotMatrix);
+		CommonOps.add(this.rotMatrix, temp1, this.rotMatrix);
+		CommonOps.mult(temp, temp2, temp3);
+		CommonOps.scale(1-Math.cos(rot.magnitude()), temp3);
+		CommonOps.add(this.rotMatrix, temp3, this.rotMatrix);
 		
 	}
 

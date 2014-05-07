@@ -33,6 +33,7 @@ public class Renderer implements GLEventListener {
 		gl.glTranslatef(0.0f, 0.0f, -5.0f);
  
 		arm.updateJointPos();
+		arm.solve(new Point(1,1,1));
 		arm.draw(gl);
 	}
  

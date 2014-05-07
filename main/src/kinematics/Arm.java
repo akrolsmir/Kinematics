@@ -60,26 +60,32 @@ public class Arm {
 		//holy shit this library
 		DenseMatrix64F ATrans = new DenseMatrix64F(A.numCols, A.numRows);
 		CommonOps.transpose(A,ATrans);
+		DenseMatrix64F temp = new DenseMatrix64F(A.numRows, A.numRows);
+		DenseMatrix64F temp1 = new DenseMatrix64F(A.numRows, A.numRows);
 		DenseMatrix64F result = new DenseMatrix64F(A.numCols, A.numRows);
-		CommonOps.mult(A,ATrans,result);
-		CommonOps.invert(result,result);
-		CommonOps.mult(ATrans,result,result);
+		CommonOps.mult(A,ATrans,temp);
+		CommonOps.invert(temp,temp1);
+		CommonOps.mult(ATrans,temp1,result);
 		return result;
 	}
 	
 	public DenseMatrix64F getJacobian(){
 		//DenseMatrix64 totalRot = CommonOps.identity(0);
 		//Assume there is more than one segment
-		DenseMatrix64F currRot = segments.get(0).rotMatrix;
+		DenseMatrix64F currRot = segments.get(0).rotMatrix.copy();
 		DenseMatrix64F temp = segments.get(0).getJacobian();
-		CommonOps.mult(currRot, temp, temp);
-		DenseMatrix64F totalRot = temp.copy();
+		DenseMatrix64F temp1 = segments.get(0).getJacobian();
+		CommonOps.mult(currRot, temp1, temp);
+		DenseMatrix64F totalRot = new DenseMatrix64F(3,3*numSegments);
+		CommonOps.insert(temp, totalRot, 0,3*(numSegments-1));
 		for(int i = 1; i < numSegments; i++){
-			temp = segments.get(i).rotMatrix;
-			CommonOps.mult(currRot,temp,currRot);
+			temp = segments.get(i).rotMatrix.copy();
+			temp1 = segments.get(i).rotMatrix.copy();
+			DenseMatrix64F tempcurrRot = segments.get(i).rotMatrix.copy();
+			CommonOps.mult(currRot,temp,tempcurrRot);
 			temp = segments.get(i).getJacobian();
-			CommonOps.mult(currRot, temp, temp);
-			CommonOps.insert(temp, totalRot, 3*i,3*i);
+			CommonOps.mult(tempcurrRot, temp1, temp);
+			CommonOps.insert(temp, totalRot, 0,3*(numSegments-i-1));
 		}
 		
 		return totalRot;
@@ -94,7 +100,30 @@ public class Arm {
 		//PROBABLY DON'T NEED THIS
 	}
 	
-	public void solve(Point p){
+	public void solve(Point goal){
+		updateJointPos();
+		double epsilon = .01;
+		double k = .01;
+		while(segments.get(numSegments-1).end.subtract(goal).magnitude() > epsilon){
+			DenseMatrix64F rots = invertMatrix(getJacobian());
+			CommonOps.scale(k, rots);
+			Point diff = segments.get(numSegments-1).end.subtract(goal);
+			DenseMatrix64F mat_diff = new DenseMatrix64F(3,1);
+			mat_diff.set(0,0,diff.getX());
+			mat_diff.set(1,0,diff.getY());
+			mat_diff.set(2,0,diff.getZ());
+			DenseMatrix64F result = new DenseMatrix64F(3*numSegments,1);
+			CommonOps.mult(rots, mat_diff, result);
+			
+			//prolly make in another method
+			for(int i = 0; i < numSegments; i++){
+				double x = result.get(3*i,0);
+				double y = result.get(3*i+1,0);
+				double z = result.get(3*i+2,0);
+				segments.get(i).rot = segments.get(i).rot.add(new Point(x,y,z));
+			}
+			updateJointPos();
+		}
 		/**
 		 * While there is some error
 		 * do stuff
