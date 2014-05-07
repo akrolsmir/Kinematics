@@ -10,7 +10,6 @@ public class BallJoint extends Joint {
 		this.length = length;
 		this.pos = pos;
 		this.rot = rot;
-		updateEnd();
 	}
 
 	@Override
@@ -23,8 +22,8 @@ public class BallJoint extends Joint {
 	
 	@Override
 	// Calculate endpoint with Rodriguez formula
-	public void updateEnd() {
-		Point x = new Point(length, 0, 0);
+	public void updateEnd(Point prevPos) {
+		Point x = prevPos == null ? new Point(length, 0, 0) : pos.subtract(prevPos);
 		double theta = rot.magnitude();
 		if (theta == 0.0) {
 			end = x;

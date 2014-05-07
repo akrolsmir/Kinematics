@@ -30,11 +30,12 @@ public class Arm {
 	
 	// Update the position of every joint that's not the first
 	public void updateJointPos() {
-		Point pos = null;
-		for(Joint j : segments){
-			j.pos = pos == null ? j.pos : pos;
-			j.updateEnd();
-			pos = j.end;
+		segments.get(0).updateEnd(null);
+		for(int i = 1; i < numSegments; i++){
+			Joint j = segments.get(i);
+			Joint prev = segments.get(i - 1);
+			j.pos = prev.end;
+			j.updateEnd(prev.pos);
 		}
 	}
 	

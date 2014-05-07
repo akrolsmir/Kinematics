@@ -15,7 +15,7 @@ public abstract class Joint {
 	
 	public abstract void draw(GL2 gl);
 	
-	public abstract void updateEnd();
+	public abstract void updateEnd(Point prevPos);
 	
 	public void setAngle(double angle){
 //		theta = angle;
