@@ -70,12 +70,16 @@ public class Arm {
 	public DenseMatrix64F getJacobian(){
 		//DenseMatrix64 totalRot = CommonOps.identity(0);
 		//Assume there is more than one segment
-		DenseMatrix64F currRot = segments.get(0).getJacobian();
-		DenseMatrix64F totalRot = currRot.copy();
+		DenseMatrix64F currRot = segments.get(0).rotMatrix;
+		DenseMatrix64F temp = segments.get(0).getJacobian();
+		CommonOps.mult(currRot, temp, temp);
+		DenseMatrix64F totalRot = temp.copy();
 		for(int i = 1; i < numSegments; i++){
-			DenseMatrix64F temp = segments.get(i).rotMatrix;
+			temp = segments.get(i).rotMatrix;
 			CommonOps.mult(currRot,temp,currRot);
-			CommonOps.insert(currRot, totalRot, 3*i,3*i);
+			temp = segments.get(i).getJacobian();
+			CommonOps.mult(currRot, temp, temp);
+			CommonOps.insert(temp, totalRot, 3*i,3*i);
 		}
 		
 		return totalRot;
