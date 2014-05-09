@@ -20,12 +20,14 @@ public class Renderer implements GLEventListener {
 	static double angle = 0.0;
 	
 	Joint ballJoint = new BallJoint(1, new Point(0, 0, 0), new Point(1, 1, 1));
-	Arm arm = new Arm(Arrays.asList(new Joint[]{
+	static Arm arm = new Arm(Arrays.asList(new Joint[]{
 			new BallJoint(1, new Point(0, 0, 0), new Point(0, 0, 0)),
 			new BallJoint(1, new Point(0, 1, 0), new Point(0, 0, 1.57)),
 			new BallJoint(1, new Point(1, 0, 0), new Point(3, 1, 1)),
 			new BallJoint(1, new Point(0, 1, 0), new Point(0, 0, 1.57)),
 	}));
+	
+	static Point goal;
  
 	@Override
 	public void display(GLAutoDrawable gLDrawable) {
@@ -36,7 +38,7 @@ public class Renderer implements GLEventListener {
 		gl.glTranslatef(0.0f, 0.0f, -5.0f);
  
 		arm.updateJointPos();
-		Point goal = new Point(0,4.1*Math.sin(angle),0);
+		//Point goal = new Point(Math.cos(angle),Math.sin(angle),0);
 		arm.solve(goal, gl);
 		//arm.solve(new Point(0,0,5));
 		//arm.draw(gl);
@@ -44,7 +46,7 @@ public class Renderer implements GLEventListener {
 		gl.glColor3d(1.0, 0.0, 0.0);
 		gl.glVertex3d(goal.getX(),goal.getY(),goal.getZ());
 		gl.glEnd();
-		angle += 0.001;
+		//angle += 0.001;
 	}
  
 	@Override
@@ -76,6 +78,8 @@ public class Renderer implements GLEventListener {
 	}
  
 	public static void main(String[] args) {
+		arm.updateJointPos();
+		goal = arm.getEnd().add(Point.ZERO);
 		final GLCanvas canvas = new GLCanvas();
 		final Frame frame = new Frame("Jogl Quad drawing");
 		final Animator animator = new Animator(canvas);
@@ -90,6 +94,33 @@ public class Renderer implements GLEventListener {
 				System.exit(0);
 			}
 		});
+		canvas.addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyPressed(KeyEvent e) {
+				double ep = .1;
+				switch (e.getKeyCode()) {
+				case KeyEvent.VK_UP:
+					goal = new Point(goal.getX(), goal.getY()+ep,goal.getZ());
+					break;
+				case KeyEvent.VK_DOWN:
+					goal = new Point(goal.getX(), goal.getY()-ep,goal.getZ());
+					break;
+				case KeyEvent.VK_LEFT:
+					goal = new Point(goal.getX()-ep, goal.getY(),goal.getZ());
+					break;
+				case KeyEvent.VK_RIGHT:
+					goal = new Point(goal.getX()+ep, goal.getY(),goal.getZ());
+					break;
+				case KeyEvent.VK_EQUALS:
+					goal = new Point(goal.getX(), goal.getY(),goal.getZ()+ep);
+					break;
+				case KeyEvent.VK_MINUS:
+					goal = new Point(goal.getX(), goal.getY(),goal.getZ()-ep);
+					break;
+				}
+			}
+		});
+
 		frame.setVisible(true);
 		animator.start();
 		canvas.requestFocus();
