@@ -3,7 +3,6 @@ package kinematics;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.Arrays;
-import java.util.Collections;
 
 import javax.media.opengl.*;
 import javax.media.opengl.awt.GLCanvas;
@@ -23,6 +22,8 @@ public class Renderer implements GLEventListener {
 			new BallJoint(1, new Point(1, 0, 0), new Point(3, 1, 1)),
 			new BallJoint(1, new Point(0, 1, 0), new Point(0, 0, 1.57)),
 	}));
+	
+	double startTime = System.currentTimeMillis();
  
 	@Override
 	public void display(GLAutoDrawable gLDrawable) {
@@ -34,6 +35,8 @@ public class Renderer implements GLEventListener {
  
 		arm.updateJointPos();
 		arm.draw(gl);
+		
+		new Goal().draw(gl, System.currentTimeMillis() - startTime);
 	}
  
 	@Override
