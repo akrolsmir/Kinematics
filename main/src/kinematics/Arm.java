@@ -1,5 +1,6 @@
 package kinematics;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -116,26 +117,43 @@ public class Arm {
 	
 	public void solve(Point goal, GL2 gl){
 		updateJointPos();
-		double epsilon = .1;
+		double epsilon = .2;
 		double k = 1;
-		int max_iter = 1000;
+		int max_iter = 25;
 		int curr = 0;
-		while(segments.get(numSegments-1).end.subtract(goal).magnitude() > epsilon){
+		int num = 1;
+		Point orig = segments.get(numSegments-1).pos.add(Point.ZERO);
+		ArrayList<Point>orig_rots = new ArrayList<Point>();
+		for(Joint j : segments){
+			orig_rots.add(j.rot);
+		}
+		while(getEnd().subtract(goal).magnitude() > epsilon){
 			//System.out.println(segments.get(numSegments-1).end.subtract(goal).magnitude());
 			if(curr > max_iter){
-				draw(gl);
+				if(num > 100){
+					//give up
+					for(int i = 0; i < numSegments; i++){
+						segments.get(i).rot = orig_rots.get(i);
+						segments.get(i).makeRotMatrix();
+					}
+					updateJointPos();
+					solve(goal.multiply(.75).add((orig).multiply(.25)), gl);
+					return;
+				}
+				num++;
+				//draw(gl);
 				for(Joint j : segments){
-					j.rot = j.rot.Perturb(.01);
+					j.rot = j.rot.Perturb(1);
 					j.makeRotMatrix();
 				}
 				updateJointPos();
-				return;
+				curr = 0;
 			}
 			curr++;
 			DenseMatrix64F rots = invertMatrix(getJacobian());
 			//System.out.println(rots);
 			CommonOps.scale(k, rots);
-			Point diff = goal.subtract(segments.get(numSegments-1).end);
+			Point diff = goal.subtract(getEnd());
 			DenseMatrix64F mat_diff = new DenseMatrix64F(3,1);
 			mat_diff.set(0,0,diff.getX());
 			mat_diff.set(1,0,diff.getY());

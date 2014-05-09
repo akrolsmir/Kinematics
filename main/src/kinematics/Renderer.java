@@ -38,7 +38,7 @@ public class Renderer implements GLEventListener {
 		gl.glTranslatef(0.0f, 0.0f, -5.0f);
  
 		arm.updateJointPos();
-		//Point goal = new Point(Math.cos(angle),Math.sin(angle),0);
+		//goal = new Point(Math.cos(angle),2*Math.sin(angle),0);
 		arm.solve(goal, gl);
 		//arm.solve(new Point(0,0,5));
 		//arm.draw(gl);
@@ -46,7 +46,7 @@ public class Renderer implements GLEventListener {
 		gl.glColor3d(1.0, 0.0, 0.0);
 		gl.glVertex3d(goal.getX(),goal.getY(),goal.getZ());
 		gl.glEnd();
-		//angle += 0.001;
+		angle += 0.001;
 	}
  
 	@Override
