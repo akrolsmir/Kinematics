@@ -10,14 +10,32 @@ camera.position.z = 5;
 var render = function () {
   requestAnimationFrame(render);
 
+  moveGoal();
+
+  if(stick)
+    zoom();
+  else
+    approach(arm, goal);
+
+  renderer.render(scene, camera);
+};
+
+var stick = true;
+function zoom() {
+  for(var i = 0; i < 100 && approach(arm, goal) > 0.001; i++);
+}
+
+// Moves the arm closer to goal. Returns the length of dr.
+function approach(arm, goal) {
   // calculate endpoints
   arm[0].update();
   for (var i = 1; i < arm.length; i++) {
     arm[i].update(arm[i - 1]);
   };
 
+  var dr = [0];
   var dist = $N.sub(goal, arm[arm.length - 1].end);
-  if($N.norm2(dist) > 0.1) {
+  if($N.norm2(dist) > 0.01) {
     // update rots for next render loop
     var rotMats = [$N.identity(3)];
     var jcbMats = [arm[0].jacobianMatrix()];
@@ -26,89 +44,51 @@ var render = function () {
       jcbMats.push($N.dot(rotMats[i], arm[i].jacobianMatrix()));
     }
     var j = $N.concat(jcbMats);
-    var jPlus = $N.dot($N.transpose(j), $N.inv($N.dot(j, $N.transpose(j))));
-        
-    var dr = $N.dot(jPlus, $N.mul(dist, 0.1));
+    // var jPlus = $N.dot($N.transpose(j), $N.inv($N.dot(j, $N.transpose(j))));
+    // damp = 1 / (0.1 + $N.norm2(dist)) + 1;
+
+    // Damped Least Squares
+    var jPlus = $N.dot($N.transpose(j), $N.inv(
+      $N.add($N.dot(j, $N.transpose(j)), $N.mul($N.identity(3), damp))));
+
+    // ClampMag:
+    // dist = $N.mul($N.normal(dist), Math.max($N.norm2(dist), 0.5));
+    dr = $N.dot(jPlus, dist);
 
     for(var i = 0; i < arm.length; i++) {
       $N.addeq(arm[i].rot, dr.slice(3 * i, 3 * (i + 1)));
     }
-    alerted = false;
   }
-  else if(!alerted) {
-    alert("DONE!");
-    alerted = true;
-  }
+  return $N.norm2(dr);
+}
+var damp = 20;
 
-  renderer.render(scene, camera);
-};
+// Set up the goal point
+var geometry = new THREE.OctahedronGeometry(.1);
+var oct = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial({color: 0xffff00}));
+var frame = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial({color: 0x000000, wireframe: true}));
+scene.add( oct );
+scene.add( frame );
 
+var angle = 0;
 var goal = [2, 1, 1];
 var alerted = false;
 
-function Joint(length, rot) {
-  this.length = length;
-  this.pos = [0, 0, 0];
-  this.end = [0, 0, 0];
-  this.rot = rot ? rot : [0, 0, 0];
-
-  // Initializes this joint in the scene
-  var material = new THREE.LineBasicMaterial({
-    color: 0x0000ff
-  });
-
-  var geometry = new THREE.Geometry();
-  geometry.vertices.push(new THREE.Vector3().fromArray(this.pos));
-  geometry.vertices.push(new THREE.Vector3().fromArray(this.end));
-
-  var line = new THREE.Line( geometry, material );
-  scene.add( line );
-
-  this.geometry = geometry;
+function moveGoal() {
+  angle += 0.005;
+  goal = [8 * Math.sin(0.5 * angle), 4 * Math.sin(angle), 0];
+  oct.position = new THREE.Vector3().fromArray(goal);
+  frame.position = oct.position;
+  oct.rotation.y += 0.1;
+  frame.rotation.y += 0.1;
 }
 
-Joint.prototype.update = function(prev) {
-  // Recalculate the pos and end based on prev and this.rot
-  this.pos = prev ? prev.end : this.pos;
-  var x = prev ? $N.mul($N.normal($N.sub(prev.end, prev.pos)), this.length) : [this.length, 0, 0];
-  var theta = $N.norm2(this.rot);
-  if (theta == 0) {
-    this.end = x;
-  } else {
-    var norm = $N.normal(this.rot);
-    this.end = $N.add($N.mul(norm, $N.dot(norm, x)),
-      $N.mul($N.cross(norm, x), Math.sin(theta)),
-      $N.mul($N.cross(norm, $N.cross(norm, x)), -Math.cos(theta)));
-  }
-  $N.addeq(this.end, this.pos);
-
-  // Update the geometry
-  this.geometry.vertices[0] = new THREE.Vector3().fromArray(this.pos);
-  this.geometry.vertices[1] = new THREE.Vector3().fromArray(this.end);
-  this.geometry.verticesNeedUpdate = true;
-}
-
-Joint.prototype.jacobianMatrix = function() {
-  return crossMatrix($N.sub(this.pos, this.end));
-}
-
-Joint.prototype.rotationMatrix = function() {
-  var theta = $N.norm2(this.rot);
-  var rx = crossMatrix($N.normal(this.rot));
-  return $N.add($N.mul(rx, Math.sin(theta)), 
-    $N.identity(3), 
-    $N.mul($N.dot(rx, rx), 1 - Math.cos(theta)));
-}
-
-function crossMatrix(v) {
-  return [[0, -v[2], v[1]],
-          [v[2], 0, -v[0]],
-          [-v[2], v[1], 0]];
-}
-
+// Set up the arm and render everything
 var joint1 = new Joint(1, [0, 0, 0]);
 var joint2 = new Joint(3, [0, 0, 1.57]);
 var joint3 = new Joint(2, [3, 0, 0]);
 var joint4 = new Joint(1, [0.5, 0.2, 1.0]);
-var arm = [joint1, joint2, joint3, joint4];
+// var joint5 = new Joint(0.3, [0.1, 0.2, 0.3]);
+// var joint6 = new Joint(0.5);
+var arm = [joint1, joint2, joint3, joint4,];
 render();
