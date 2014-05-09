@@ -28,6 +28,10 @@ public class Arm {
 		}
 	}
 	
+	public Point getEnd(){
+		return segments.get(numSegments-1).end;
+	}
+	
 	// Update the position of every joint that's not the first
 	public void updateJointPos() {
 		segments.get(0).updateEnd(null);
@@ -110,29 +114,27 @@ public class Arm {
 		//PROBABLY DON'T NEED THIS
 	}
 	
-	public void solve(Point goal){
+	public void solve(Point goal, GL2 gl){
 		updateJointPos();
-		double epsilon = .2;
-		double k = .1;
-		int max_iter = 10000;
+		double epsilon = .1;
+		double k = 1;
+		int max_iter = 1000;
 		int curr = 0;
 		while(segments.get(numSegments-1).end.subtract(goal).magnitude() > epsilon){
 			//System.out.println(segments.get(numSegments-1).end.subtract(goal).magnitude());
 			if(curr > max_iter){
+				draw(gl);
 				for(Joint j : segments){
-					j.rot = j.rot.Perturb(.1);
+					j.rot = j.rot.Perturb(.01);
 					j.makeRotMatrix();
 				}
 				updateJointPos();
-				System.out.println("hi" + curr);
-				//solve(new Point(1,0,0));
-				curr = 0;
+				return;
 			}
 			curr++;
 			DenseMatrix64F rots = invertMatrix(getJacobian());
 			//System.out.println(rots);
 			CommonOps.scale(k, rots);
-			//Point diff = segments.get(numSegments-1).end.subtract(goal);
 			Point diff = goal.subtract(segments.get(numSegments-1).end);
 			DenseMatrix64F mat_diff = new DenseMatrix64F(3,1);
 			mat_diff.set(0,0,diff.getX());
@@ -140,7 +142,6 @@ public class Arm {
 			mat_diff.set(2,0,diff.getZ());
 			DenseMatrix64F result = new DenseMatrix64F(3*numSegments,1);
 			CommonOps.mult(rots, mat_diff, result);
-			//System.out.println(result);
 			
 			//prolly make in another method
 			for(int i = 0; i < numSegments; i++){
@@ -151,6 +152,7 @@ public class Arm {
 			}
 			updateJointPos();
 		}
+		draw(gl);
 	}
 
 }

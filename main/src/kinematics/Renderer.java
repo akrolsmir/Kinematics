@@ -8,6 +8,7 @@ import java.util.Collections;
 import javax.media.opengl.*;
 import javax.media.opengl.awt.GLCanvas;
 import javax.media.opengl.fixedfunc.*;
+
 import com.jogamp.opengl.util.Animator;
  
 /**
@@ -35,8 +36,14 @@ public class Renderer implements GLEventListener {
 		gl.glTranslatef(0.0f, 0.0f, -5.0f);
  
 		arm.updateJointPos();
-		arm.solve(new Point(Math.cos(angle),Math.sin(angle),1));
-		arm.draw(gl);
+		Point goal = new Point(0,4.1*Math.sin(angle),0);
+		arm.solve(goal, gl);
+		//arm.solve(new Point(0,0,5));
+		//arm.draw(gl);
+		gl.glBegin(GL2.GL_POINTS);
+		gl.glColor3d(1.0, 0.0, 0.0);
+		gl.glVertex3d(goal.getX(),goal.getY(),goal.getZ());
+		gl.glEnd();
 		angle += 0.001;
 	}
  
