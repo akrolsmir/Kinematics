@@ -33,7 +33,9 @@ Joint.prototype.update = function(prev) {
       $N.mul($N.cross(norm, $N.cross(norm, x)), -Math.cos(theta)));
   }
   $N.addeq(this.end, this.pos);
+}
 
+Joint.prototype.show = function() {
   // Update the geometry
   this.geometry.vertices[0] = new THREE.Vector3().fromArray(this.pos);
   this.geometry.vertices[1] = new THREE.Vector3().fromArray(this.end);
@@ -41,7 +43,7 @@ Joint.prototype.update = function(prev) {
 }
 
 Joint.prototype.jacobianMatrix = function() {
-  return crossMatrix($N.sub(this.pos, this.end));
+  return crossMatrix($N.sub([0, 0, 0], this.end));
 }
 
 Joint.prototype.rotationMatrix = function() {

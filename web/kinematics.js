@@ -17,12 +17,16 @@ var render = function () {
   else
     approach(arm, goal);
 
+  for(var i = 0; i < arm.length; i++) {
+    arm[i].show();
+  }
+
   renderer.render(scene, camera);
 };
 
 var stick = true;
 function zoom() {
-  for(var i = 0; i < 100 && approach(arm, goal) > 0.001; i++);
+  for(var i = 0; i < 100 && approach(arm, goal) > 0.0001; i++);  
 }
 
 // Moves the arm closer to goal. Returns the length of dr.
@@ -40,7 +44,7 @@ function approach(arm, goal) {
     var rotMats = [$N.identity(3)];
     var jcbMats = [arm[0].jacobianMatrix()];
     for(var i = 1; i < arm.length; i++) {
-      rotMats.push($N.dot(arm[i].rotationMatrix(), rotMats[i - 1]));
+      rotMats.push($N.dot(rotMats[i - 1], arm[i].rotationMatrix()));
       jcbMats.push($N.dot(rotMats[i], arm[i].jacobianMatrix()));
     }
     var j = $N.concat(jcbMats);
@@ -59,6 +63,9 @@ function approach(arm, goal) {
       $N.addeq(arm[i].rot, dr.slice(3 * i, 3 * (i + 1)));
     }
   }
+  if($N.norm2(dr) == 0) {
+    console.log("out of reach?");
+  }
   return $N.norm2(dr);
 }
 var damp = 20;
@@ -75,7 +82,7 @@ var goal = [2, 1, 1];
 var alerted = false;
 
 function moveGoal() {
-  angle += 0.005;
+  angle += 0.015;
   goal = [8 * Math.sin(0.5 * angle), 4 * Math.sin(angle), 0];
   oct.position = new THREE.Vector3().fromArray(goal);
   frame.position = oct.position;
@@ -88,7 +95,5 @@ var joint1 = new Joint(1, [0, 0, 0]);
 var joint2 = new Joint(3, [0, 0, 1.57]);
 var joint3 = new Joint(2, [3, 0, 0]);
 var joint4 = new Joint(1, [0.5, 0.2, 1.0]);
-// var joint5 = new Joint(0.3, [0.1, 0.2, 0.3]);
-// var joint6 = new Joint(0.5);
 var arm = [joint1, joint2, joint3, joint4,];
 render();
