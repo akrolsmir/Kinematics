@@ -11,9 +11,13 @@ public class BallJoint extends Joint {
 		this.length = length;
 		this.pos = pos;
 		this.rot = rot;
+		makeRotMatrix();
+		
+	}
+	
+	public void makeRotMatrix(){
 		this.rotMatrix = CommonOps.identity(3);
 		Point rotNorm = rot.normalize();
-		//CommonOps.add
 		double[][] rot_array = new double[][]{{0,-rotNorm.getZ(),rotNorm.getY()},
 				{rotNorm.getZ(),0,-rotNorm.getX()},
 				{-rotNorm.getY(),rotNorm.getX(),0}};
@@ -26,14 +30,13 @@ public class BallJoint extends Joint {
 		CommonOps.mult(temp, temp2, temp3);
 		CommonOps.scale(1-Math.cos(rot.magnitude()), temp3);
 		CommonOps.add(this.rotMatrix, temp3, this.rotMatrix);
-		
 	}
 
 	@Override
 	public DenseMatrix64F getJacobian(){
-		double[][] pos_array = new double[][]{{0,pos.getZ(),-pos.getY()},
-				{-pos.getZ(),0,pos.getX()},
-				{pos.getY(),-pos.getX(),0}};
+		double[][] pos_array = new double[][]{{0,end.getZ(),-end.getY()},
+				{-end.getZ(),0,end.getX()},
+				{end.getY(),-end.getX(),0}};
 		return new DenseMatrix64F(pos_array);
 	}
 	

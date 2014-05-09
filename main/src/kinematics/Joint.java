@@ -15,6 +15,8 @@ public abstract class Joint {
 	
 	public abstract DenseMatrix64F getJacobian();
 	
+	public abstract void makeRotMatrix();
+	
 	public abstract void draw(GL2 gl);
 	
 	public abstract void updateEnd(Point prevPos);

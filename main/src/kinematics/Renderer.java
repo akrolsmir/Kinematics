@@ -37,7 +37,6 @@ public class Renderer implements GLEventListener {
 		arm.updateJointPos();
 		arm.solve(new Point(Math.cos(angle),Math.sin(angle),1));
 		arm.draw(gl);
-		System.out.println(angle);
 		angle += 0.001;
 	}
  

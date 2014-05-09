@@ -392,6 +392,13 @@ public class Point {
     public Point crossProduct(Point vector) {
         return crossProduct(vector.getX(), vector.getY(), vector.getZ());
     }
+    
+    public Point Perturb(double ep){
+    	double x0 = x + Math.random()*ep - ep/2;
+    	double y0 = y + Math.random()*ep - ep/2;
+    	double z0 = z + Math.random()*ep - ep/2;
+    	return new Point(x0,y0,z0);
+    }
 
     /**
      * Returns a hash code value for the point.
