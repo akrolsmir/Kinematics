@@ -154,7 +154,7 @@ public class Arm {
 			//System.out.println(segments.get(numSegments-1).end.subtract(goal).magnitude());
 			
 			if(curr > max_iter){
-				if(num > 0){
+				if(num > 5){
 					System.out.println("hello");
 					//give up
 					for(int i = 0; i < numSegments; i++){
