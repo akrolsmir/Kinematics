@@ -8,7 +8,7 @@ public class Goal {
 		Point goal = goalAt(time);
 		
 		arm.updateJointPos();
-		arm.solve(goal, gl, .2);
+		arm.solve(goal, gl, .1);
 
 		gl.glPointSize(5);
 		gl.glColor4f(0.9f, 0.9f, 0.9f, 1.0f);
@@ -19,8 +19,8 @@ public class Goal {
 	}
 
 	public static Point goalAt(double timeInMS) {
-		double angle = timeInMS * 2 * Math.PI / 10000;
+		double angle = timeInMS * Math.PI / 10000;
 		
-		return new Point(4 * Math.sin(0.5 * angle), 2 * Math.sin(angle), 0);
+		return new Point(2 * Math.sin(0.5 * angle), 2 * Math.sin(angle), 0);
 	}
 }

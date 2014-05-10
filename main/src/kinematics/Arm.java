@@ -10,6 +10,7 @@ import org.ejml.data.DenseMatrix64F;
 import org.ejml.factory.DecompositionFactory;
 import org.ejml.factory.SingularValueDecomposition;
 import org.ejml.ops.CommonOps;
+import org.ejml.ops.NormOps;
 
 public class Arm {
 	
@@ -74,7 +75,7 @@ public class Arm {
 			System.out.println(CommonOps.det(temp));
 			System.out.println("hi");
 			for(Joint j : segments){
-				j.rot = j.rot.Perturb(.1);
+				j.rot = j.rot.Perturb(.001);
 				j.makeRotMatrix();
 			}
 			updateJointPos();
@@ -105,6 +106,7 @@ public class Arm {
 			DenseMatrix64F tempcurrRot = segments.get(i).rotMatrix.copy();
 			//CommonOps.mult(currRot,temp,tempcurrRot);
 			temp = segments.get(i).getJacobian(goal).copy();
+			CommonOps.transpose(tempcurrRot);
 			DenseMatrix64F temp2 = temp.copy();
 			CommonOps.mult(tempcurrRot, temp, temp2);
 			CommonOps.insert(temp2, totalRot, 0,3*i);
@@ -124,13 +126,25 @@ public class Arm {
 		//PROBABLY DON'T NEED THIS
 	}
 	
+	public double getLength(){
+		double len = 0.0;
+		for(Joint j : segments){
+			len += j.length;
+		}
+		return len;
+	}
+	
 	public void solve(Point goal, GL2 gl, double ep){
 		updateJointPos();
 		//double epsilon = .2;
-		double k = 1;
-		int max_iter = 200;
+		double k = .2;
+		int max_iter = 50000;
 		int curr = 0;
 		int num = 1;
+		if(goal.magnitude() > getLength()){
+			solve(goal.normalize().multiply(getLength()*.98), gl, ep);
+			return;
+		}
 		Point orig = segments.get(numSegments-1).end.add(Point.ZERO);
 		ArrayList<Point>orig_rots = new ArrayList<Point>();
 		for(Joint j : segments){
@@ -138,15 +152,17 @@ public class Arm {
 		}
 		while(getEnd().subtract(goal).magnitude() > ep){
 			//System.out.println(segments.get(numSegments-1).end.subtract(goal).magnitude());
+			
 			if(curr > max_iter){
-				if(num > 10){
+				if(num > 0){
+					System.out.println("hello");
 					//give up
 					for(int i = 0; i < numSegments; i++){
 						segments.get(i).rot = orig_rots.get(i);
 						segments.get(i).makeRotMatrix();
 					}
 					updateJointPos();
-					solve(goal.normalize().multiply(goal.dotProduct(orig)*0.5), gl, 2.5*ep);
+					solve(goal.multiply(.1).add(orig.multiply(.9)), gl, ep);
 					return;
 				}
 				num++;
@@ -169,6 +185,11 @@ public class Arm {
 			mat_diff.set(2,0,diff.getZ());
 			DenseMatrix64F result = new DenseMatrix64F(3*numSegments,1);
 			CommonOps.mult(rots, mat_diff, result);
+			if(NormOps.elementP(result,2) > 100){
+				System.out.println("Difference too great");
+				solve(orig, gl, ep);
+				return;
+			}
 			//System.out.println(getJacobian());
 			
 			//prolly make in another method
