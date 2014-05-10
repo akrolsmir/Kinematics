@@ -3,7 +3,6 @@ package kinematics;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.Arrays;
-import java.util.Collections;
 
 import javax.media.opengl.*;
 import javax.media.opengl.awt.GLCanvas;
@@ -22,12 +21,13 @@ public class Renderer implements GLEventListener {
 	Joint ballJoint = new BallJoint(1, new Point(0, 0, 0), new Point(1, 1, 1));
 	static Arm arm = new Arm(Arrays.asList(new Joint[]{
 			new BallJoint(1, new Point(0, 0, 0), new Point(0, 0, 0)),
-			new BallJoint(.5, new Point(0, 1, 0), new Point(0, 0, 0)),
-			new BallJoint(.25, new Point(1, 0, 0), new Point(0, 0, 0)),
-			new BallJoint(.125, new Point(0, 1, 0), new Point(0,0,0)),
+			new BallJoint(3, new Point(0, 1, 0), new Point(0, 0, 1.57)),
+			new BallJoint(2, new Point(1, 0, 0), new Point(3, 0, 0)),
+			new BallJoint(1, new Point(0, 1, 0), new Point(0.5, 0.2, 1.0)),
 	}));
 	
 	static Point goal;
+	double startTime = System.currentTimeMillis();
  
 	@Override
 	public void display(GLAutoDrawable gLDrawable) {
@@ -37,6 +37,7 @@ public class Renderer implements GLEventListener {
 		gl.glLoadIdentity();
 		gl.glTranslatef(0.0f, 0.0f, -5.0f);
  
+		/*
 		arm.updateJointPos();
 		goal = new Point(1*Math.sin(0.5*angle),1*Math.sin(angle),0);
 		arm.solve(goal, gl, .05);
@@ -47,6 +48,8 @@ public class Renderer implements GLEventListener {
 		gl.glVertex3d(goal.getX(),goal.getY(),goal.getZ());
 		gl.glEnd();
 		angle += 0.005;
+		*/
+		Goal.draw(arm, gl, System.currentTimeMillis() - startTime);
 	}
  
 	@Override
