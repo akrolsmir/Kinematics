@@ -22,9 +22,9 @@ public class Renderer implements GLEventListener {
 	Joint ballJoint = new BallJoint(1, new Point(0, 0, 0), new Point(1, 1, 1));
 	static Arm arm = new Arm(Arrays.asList(new Joint[]{
 			new BallJoint(1, new Point(0, 0, 0), new Point(0, 0, 0)),
-			new BallJoint(1, new Point(0, 1, 0), new Point(0, 0, 1.57)),
-			new BallJoint(1, new Point(1, 0, 0), new Point(3, 1, 1)),
-			new BallJoint(1, new Point(0, 1, 0), new Point(0, 0, 1.57)),
+			new BallJoint(.5, new Point(0, 1, 0), new Point(0, 0, 0)),
+			new BallJoint(.25, new Point(1, 0, 0), new Point(0, 0, 0)),
+			new BallJoint(.125, new Point(0, 1, 0), new Point(0,0,0)),
 	}));
 	
 	static Point goal;
@@ -38,15 +38,15 @@ public class Renderer implements GLEventListener {
 		gl.glTranslatef(0.0f, 0.0f, -5.0f);
  
 		arm.updateJointPos();
-		//goal = new Point(Math.cos(angle),2*Math.sin(angle),0);
-		arm.solve(goal, gl);
+		goal = new Point(1*Math.sin(0.5*angle),1*Math.sin(angle),0);
+		arm.solve(goal, gl, .05);
 		//arm.solve(new Point(0,0,5));
 		//arm.draw(gl);
 		gl.glBegin(GL2.GL_POINTS);
 		gl.glColor3d(1.0, 0.0, 0.0);
 		gl.glVertex3d(goal.getX(),goal.getY(),goal.getZ());
 		gl.glEnd();
-		angle += 0.001;
+		angle += 0.005;
 	}
  
 	@Override
@@ -79,6 +79,7 @@ public class Renderer implements GLEventListener {
  
 	public static void main(String[] args) {
 		arm.updateJointPos();
+		//System.out.println(arm.getJacobian());
 		goal = arm.getEnd().add(Point.ZERO);
 		final GLCanvas canvas = new GLCanvas();
 		final Frame frame = new Frame("Jogl Quad drawing");

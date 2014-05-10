@@ -13,7 +13,7 @@ public abstract class Joint {
 	public DenseMatrix64F rotMatrix;
 	public double length;
 	
-	public abstract DenseMatrix64F getJacobian();
+	public abstract DenseMatrix64F getJacobian(Point p);
 	
 	public abstract void makeRotMatrix();
 	
@@ -25,12 +25,14 @@ public abstract class Joint {
 //		theta = angle;
 	}
 	
+	/*
 	public DenseMatrix64F rotJacobian(DenseMatrix64F rotation){
 		DenseMatrix64F result = new DenseMatrix64F(rotMatrix.numCols, rotMatrix.numRows);
 		CommonOps.mult(rotation, rotMatrix, result);
-		CommonOps.mult(result, getJacobian(), result);
+		CommonOps.mult(result, getJacobian(end), result);
 		return result;
 	}
+	*/
 	
 	public double computeAngle(double pos){
 		//TODO

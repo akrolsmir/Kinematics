@@ -33,10 +33,23 @@ public class BallJoint extends Joint {
 	}
 
 	@Override
-	public DenseMatrix64F getJacobian(){
-		double[][] pos_array = new double[][]{{0,end.getZ(),-end.getY()},
-				{-end.getZ(),0,end.getX()},
-				{end.getY(),-end.getX(),0}};
+	public DenseMatrix64F getJacobian(Point p){
+		/*
+		DenseMatrix64F temp1 = new DenseMatrix64F(rotMat.numRows, rotMat.numCols);
+		CommonOps.transpose(rotMat, temp1);
+		//Point temp = p.subtract(pos);
+		double[][] temp_arr = new double[][]{{p.getX()},{p.getY()},{p.getZ()}};
+		DenseMatrix64F temp2 = new DenseMatrix64F(temp_arr);
+		DenseMatrix64F temp3 = new DenseMatrix64F(temp_arr);
+		CommonOps.mult(temp1, temp2, temp3);
+		Point temp = new Point(temp3.get(0,0), temp3.get(1,0), temp3.get(2,0));
+		temp = temp.subtract(pos);
+		*/
+		//Point temp = p.subtract(pos);
+		Point temp = p.subtract(pos);
+		double[][] pos_array = new double[][]{{0,temp.getZ(),-temp.getY()},
+				{-temp.getZ(),0,temp.getX()},
+				{temp.getY(),-temp.getX(),0}};
 		return new DenseMatrix64F(pos_array);
 	}
 	
