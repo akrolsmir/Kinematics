@@ -20,10 +20,10 @@ public class Renderer implements GLEventListener {
 	
 	Joint ballJoint = new BallJoint(1, new Point(0, 0, 0), new Point(1, 1, 1));
 	static Arm arm = new Arm(Arrays.asList(new Joint[]{
-			new BallJoint(.5, new Point(0, 0, 0), new Point(0, 0, 0)),
+			new BallJoint(1, new Point(0, 0, 0), new Point(0, 0, 0)),
 			new BallJoint(.5, new Point(0, 1, 0), new Point(0, 0, 1.57)),
-			new BallJoint(.5, new Point(1, 0, 0), new Point(3, 0, 0)),
-			new BallJoint(.5, new Point(0, 1, 0), new Point(0.5, 0.2, 1.0)),
+			new BallJoint(.25, new Point(1, 0, 0), new Point(3, 0, 0)),
+			new BallJoint(.125, new Point(0, 1, 0), new Point(0.5, 0.2, 1.0)),
 	}));
 	
 	static Point goal;

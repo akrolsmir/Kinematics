@@ -137,8 +137,8 @@ public class Arm {
 	public void solve(Point goal, GL2 gl, double ep){
 		updateJointPos();
 		//double epsilon = .2;
-		double k = .2;
-		int max_iter = 50000;
+		double k = 1.0;
+		int max_iter = 1000;
 		int curr = 0;
 		int num = 1;
 		if(goal.magnitude() > getLength()){
@@ -162,13 +162,13 @@ public class Arm {
 						segments.get(i).makeRotMatrix();
 					}
 					updateJointPos();
-					solve(goal.multiply(.1).add(orig.multiply(.9)), gl, ep);
+					solve(goal.multiply(.5).add(orig.multiply(.5)), gl, ep);
 					return;
 				}
 				num++;
 				//draw(gl);
 				for(Joint j : segments){
-					j.rot = j.rot.Perturb(.1);
+					j.rot = j.rot.Perturb(.01);
 					j.makeRotMatrix();
 				}
 				updateJointPos();
