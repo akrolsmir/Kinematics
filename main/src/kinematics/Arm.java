@@ -169,7 +169,7 @@ public class Arm {
 	public void solve(Point goal, GL2 gl, double ep){
 		updateJointPos();
 		//double epsilon = .2;
-		double k = .25;
+		double k = 1;
 		int max_iter = 5000;
 		int curr = 0;
 		int num = 1;
@@ -183,7 +183,7 @@ public class Arm {
 				solve(getEnd(), gl, ep);
 				return;
 			}
-			solve(goal.normalize().multiply((2*segments.get(0).length - getLength())*1.01), gl, ep);
+			solve(goal.normalize().multiply((2*segments.get(0).length - getLength())*1.1), gl, ep);
 			return;
 		}
 		Point orig = segments.get(numSegments-1).end.add(Point.ZERO);
