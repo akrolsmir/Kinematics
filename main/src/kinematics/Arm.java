@@ -177,7 +177,12 @@ public class Arm {
 			solve(goal.normalize().multiply(getLength()*.97), gl, ep);
 			return;
 		}
+		
 		if(2*segments.get(0).length - getLength() > 0 && goal.magnitude() < 2*segments.get(0).length - getLength()){
+			if(goal.magnitude() == 0.0){
+				solve(getEnd(), gl, ep);
+				return;
+			}
 			solve(goal.normalize().multiply((2*segments.get(0).length - getLength())*1.01), gl, ep);
 			return;
 		}
