@@ -82,7 +82,7 @@ public class Renderer implements GLEventListener {
  
 	public static void main(String[] args) {
 		arm.updateJointPos();
-		//System.out.println(arm.getJacobian());
+		System.out.println(arm.getJacobian(arm.getEnd()));
 		goal = arm.getEnd().add(Point.ZERO);
 		final GLCanvas canvas = new GLCanvas();
 		final Frame frame = new Frame("Jogl Quad drawing");
