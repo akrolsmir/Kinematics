@@ -170,7 +170,7 @@ public class Arm {
 		updateJointPos();
 		//double epsilon = .2;
 		double k = 1;
-		int max_iter = 5000;
+		int max_iter = 50;
 		int curr = 0;
 		int num = 1;
 		if(goal.magnitude() > getLength()*.99){
@@ -195,7 +195,7 @@ public class Arm {
 			//System.out.println(segments.get(numSegments-1).end.subtract(goal).magnitude());
 			
 			if(curr > max_iter){
-				if(num > 5){
+				if(num > 10){
 					//give up
 					for(int i = 0; i < numSegments; i++){
 						segments.get(i).rot = orig_rots.get(i);
