@@ -8,7 +8,7 @@ public class Goal {
 		Point goal = goalAt(time);
 		
 		arm.updateJointPos();
-		arm.solve(goal, gl, .05);
+		arm.solve(goal, gl, .1);
 
 		gl.glPointSize(5);
 		gl.glColor4f(0.9f, 0.9f, 0.9f, 1.0f);

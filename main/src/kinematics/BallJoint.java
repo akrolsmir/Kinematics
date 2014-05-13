@@ -25,15 +25,16 @@ public class BallJoint extends Joint {
 		DenseMatrix64F temp1 = new DenseMatrix64F(rot_array);
 		DenseMatrix64F temp2 = new DenseMatrix64F(rot_array);
 		DenseMatrix64F temp3 = new DenseMatrix64F(rot_array);
+		DenseMatrix64F temp4 = new DenseMatrix64F(rot_array);
 		CommonOps.scale(Math.sin(rot.magnitude()), temp1);
-		CommonOps.add(this.rotMatrix, temp1, this.rotMatrix);
+		CommonOps.add(this.rotMatrix, temp1, temp4);
 		CommonOps.mult(temp, temp2, temp3);
 		CommonOps.scale(1-Math.cos(rot.magnitude()), temp3);
-		CommonOps.add(this.rotMatrix, temp3, this.rotMatrix);
+		CommonOps.add(temp4, temp3, this.rotMatrix);
 	}
 
 	@Override
-	public DenseMatrix64F getJacobian(Point p){
+	public DenseMatrix64F getJacobian(Point p, DenseMatrix64F rot){
 		/*
 		DenseMatrix64F temp1 = new DenseMatrix64F(rotMat.numRows, rotMat.numCols);
 		CommonOps.transpose(rotMat, temp1);
@@ -46,7 +47,20 @@ public class BallJoint extends Joint {
 		temp = temp.subtract(pos);
 		*/
 		//Point temp = p.subtract(pos);
-		Point temp = p.subtract(pos);
+		
+		/*
+		CommonOps.transpose(rot);
+		Point temp = p;
+		DenseMatrix64F pt = new DenseMatrix64F(3,1);
+		pt.set(0,0,temp.getX());
+		pt.set(1,0,temp.getY());
+		pt.set(2,0,temp.getZ());
+		DenseMatrix64F result = new DenseMatrix64F(3,1);
+		CommonOps.mult(rot, pt, result);
+		temp = new Point(result.get(0), result.get(1), result.get(2));
+		*/
+		//temp = end.subtract(pos);
+		Point temp = end;
 		double[][] pos_array = new double[][]{{0,temp.getZ(),-temp.getY()},
 				{-temp.getZ(),0,temp.getX()},
 				{temp.getY(),-temp.getX(),0}};
