@@ -86,160 +86,51 @@ public class Arm {
 	}
 	
 	public DenseMatrix64F getJacobian(Point goal){
-		//DenseMatrix64 totalRot = CommonOps.identity(0);
-		//Assume there is more than one segment
-		DenseMatrix64F cummulativeTransform = CommonOps.identity(4);
-		
 		//total jacobian
 		DenseMatrix64F totalRot = new DenseMatrix64F(3,3*numSegments);
 		
-		//R0<-i-1
-		DenseMatrix64F lastCurrRot = CommonOps.identity(3);
-		DenseMatrix64F backTransfHomo1 = CommonOps.identity(4);
-		for(int j = 1; j < numSegments; j++){
-			//begin homogeneous matrix
-			DenseMatrix64F backHomoRot = CommonOps.identity(4);
+		for(int i = 0; i < numSegments; i++){
+			DenseMatrix64F vec = new DenseMatrix64F(4,1);
+			vec.set(3,0,1);
 			
-			//translation
-			DenseMatrix64F tempTransHomo = CommonOps.identity(4);
-			Point t = segments.get(j).pos.subtract(segments.get(j-1).pos).normalize().multiply(-segments.get(j-1).length);
-			tempTransHomo.set(0,3,-segments.get(j-1).length);
-			/*
-			transHomo.set(0,3,-trans.getX());
-			transHomo.set(1,3,-trans.getY());
-			transHomo.set(2,3,-trans.getZ());
-			*/
-			
-			//get R0<-i
-			DenseMatrix64F temp = segments.get(j-1).rotMatrix.copy();
-			
-			//DenseMatrix64F isoRot = new DenseMatrix64F(3,3);
-			DenseMatrix64F backisoRot = segments.get(j-1).rotMatrix.copy();
-			DenseMatrix64F backisoRotTemp = new DenseMatrix64F(3,3);
-			
-			//get Ri-1<-i
-			//CommonOps.mult(tempcurrRot, isoRotTemp, isoRot);
-			
-			//transpose it
-			CommonOps.transpose(backisoRot);
-			
-			//CommonOps.transpose(temp);
-			
-			CommonOps.insert(backisoRot, backHomoRot,0,0); //make homogeneous
-
-			DenseMatrix64F backcurrHomo = CommonOps.identity(4); //current homogeneous matrix
-			
-			CommonOps.mult(tempTransHomo, backHomoRot, backcurrHomo);
-			DenseMatrix64F finBackTransform = CommonOps.identity(4);
-			
-			CommonOps.mult(backTransfHomo1, backcurrHomo, finBackTransform);
-			backTransfHomo1 = finBackTransform;
-			//DenseMatrix64F isoTransform = CommonOps.extract(currHomo, 0, 3, 0, 3);
-		}
-		DenseMatrix64F temp5 = segments.get(0).getJacobian(getEnd(), lastCurrRot);
-		DenseMatrix64F temp6 = CommonOps.identity(4);
-		CommonOps.insert(temp5, temp6, 0,0);
-		DenseMatrix64F temp7 = CommonOps.identity(4);
-		CommonOps.mult(temp6, backTransfHomo1, temp7);
-		temp7 = CommonOps.extract(temp7, 0, 3, 0, 3);
-		CommonOps.insert(temp7, totalRot, 0,0);
-		
-		for(int i = 1; i < numSegments; i++){
-			
-			//begin homogeneous matrix
-			DenseMatrix64F homoRot = CommonOps.identity(4);
-			
-			//translation
-			DenseMatrix64F transHomo = CommonOps.identity(4);
-			Point trans = segments.get(i).pos.subtract(segments.get(i-1).pos).normalize().multiply(-segments.get(i-1).length);
-			transHomo.set(0,3,-segments.get(i-1).length);
-			/*
-			transHomo.set(0,3,-trans.getX());
-			transHomo.set(1,3,-trans.getY());
-			transHomo.set(2,3,-trans.getZ());
-			*/
-			
-			//get R0<-i
-			DenseMatrix64F tempcurrRot = segments.get(i-1).rotMatrix.copy();
-			
-			//DenseMatrix64F isoRot = new DenseMatrix64F(3,3);
-			DenseMatrix64F isoRot = segments.get(i-1).rotMatrix.copy();
-			DenseMatrix64F isoRotTemp = new DenseMatrix64F(3,3);
-			CommonOps.transpose(lastCurrRot, isoRotTemp);
-			
-			//get Ri-1<-i
-			//CommonOps.mult(tempcurrRot, isoRotTemp, isoRot);
-			
-			//store R0<-i-1
-			lastCurrRot = tempcurrRot.copy();
-			//transpose it
-			CommonOps.transpose(isoRot);
-			
-			//CommonOps.transpose(temp);
-			
-			CommonOps.insert(isoRot, homoRot,0,0); //make homogeneous
-
-			DenseMatrix64F currHomo = CommonOps.identity(4); //current homogeneous matrix
-			
-			CommonOps.mult(transHomo, homoRot, currHomo);
-			//DenseMatrix64F isoTransform = CommonOps.extract(currHomo, 0, 3, 0, 3);
-			
-			DenseMatrix64F finTransform = CommonOps.identity(4);
-			
-			CommonOps.mult(cummulativeTransform, currHomo, finTransform);
-			cummulativeTransform = finTransform;
-			
-			DenseMatrix64F backTransfHomo = CommonOps.identity(4);
-			for(int j = i+1; j < numSegments; j++){
-				//begin homogeneous matrix
-				DenseMatrix64F backHomoRot = CommonOps.identity(4);
-				
-				//translation
-				DenseMatrix64F tempTransHomo = CommonOps.identity(4);
-				Point t = segments.get(j).pos.subtract(segments.get(j-1).pos).normalize().multiply(-segments.get(j-1).length);
-				tempTransHomo.set(0,3,-segments.get(j-1).length);
-				/*
-				transHomo.set(0,3,-trans.getX());
-				transHomo.set(1,3,-trans.getY());
-				transHomo.set(2,3,-trans.getZ());
-				*/
-				
-				
-				//DenseMatrix64F isoRot = new DenseMatrix64F(3,3);
-				DenseMatrix64F backisoRot = segments.get(j-1).rotMatrix.copy();
-				
-				//get Ri-1<-i
-				//CommonOps.mult(tempcurrRot, isoRotTemp, isoRot);
-				
-				//transpose it
-				CommonOps.transpose(backisoRot);
-				
-				//CommonOps.transpose(temp);
-				
-				CommonOps.insert(backisoRot, backHomoRot,0,0); //make homogeneous
-
-				DenseMatrix64F backcurrHomo = CommonOps.identity(4); //current homogeneous matrix
-				
-				CommonOps.mult(tempTransHomo, backHomoRot, backcurrHomo);
-				DenseMatrix64F finBackTransform = CommonOps.identity(4);
-				
-				CommonOps.mult(backTransfHomo, backcurrHomo, finBackTransform);
-				backTransfHomo = finBackTransform;
-				//DenseMatrix64F isoTransform = CommonOps.extract(currHomo, 0, 3, 0, 3);
+			DenseMatrix64F jacobian = new DenseMatrix64F(4,4);
+			for(int j = numSegments-1; j > i; j--){
+				DenseMatrix64F currRotation = CommonOps.identity(4);
+				DenseMatrix64F tempRot = segments.get(j).rotMatrix.copy();
+				CommonOps.insert(tempRot, currRotation, 0, 0);
+				DenseMatrix64F currTranslation = CommonOps.identity(4);
+				currTranslation.set(0,3,segments.get(j).length);
+				DenseMatrix64F temp = new DenseMatrix64F(4,1);
+				CommonOps.mult(currTranslation, vec, temp);
+				CommonOps.mult(currRotation, temp, vec);
 			}
-			//backTransfHomo = CommonOps.extract(backTransfHomo, 0, 3, 0, 3);
-			DenseMatrix64F temp = segments.get(i).getJacobian(getEnd(), CommonOps.identity(4)).copy();
-			DenseMatrix64F temp2 = CommonOps.identity(4);
-			CommonOps.insert(temp, temp2, 0,0);
-			DenseMatrix64F temp3 = CommonOps.identity(4);
-			CommonOps.mult(finTransform, temp2, temp3);
-			CommonOps.mult(temp3, backTransfHomo, temp2);
-			temp3 = CommonOps.extract(temp2, 0, 3, 0, 3);
-			CommonOps.insert(temp3, totalRot, 0,3*i);
-			//CommonOps.insert(temp, totalRot, 0,3*i);
+			DenseMatrix64F jacTranslation = CommonOps.identity(4);
+			jacTranslation.set(0,3,segments.get(i).length);
+			DenseMatrix64F temp1 = new DenseMatrix64F(4,1);
+			CommonOps.mult(jacTranslation, vec, temp1);
+			vec = temp1;
+			Point p = new Point(vec.get(0,0), vec.get(1,0), vec.get(2,0));
+			jacobian = segments.get(i).getJacobian(p);
+			DenseMatrix64F jacRotation = CommonOps.identity(4);
+			DenseMatrix64F tempjacRotation = segments.get(i).rotMatrix.copy();
+			CommonOps.insert(tempjacRotation, jacRotation, 0, 0);
+			DenseMatrix64F temp2 = new DenseMatrix64F(4,4);
+			CommonOps.mult(jacRotation, jacobian, temp2);
+			jacobian = temp2;
+			for(int j = i-1; j >= 0; j--){
+				DenseMatrix64F currRotation = CommonOps.identity(4);
+				DenseMatrix64F tempRot = segments.get(j).rotMatrix.copy();
+				CommonOps.insert(tempRot, currRotation, 0, 0);
+				DenseMatrix64F currTranslation = CommonOps.identity(4);
+				currTranslation.set(0,3,segments.get(j).length);
+				DenseMatrix64F temp = new DenseMatrix64F(4,4);
+				CommonOps.mult(currTranslation, jacobian, temp);
+				CommonOps.mult(currRotation, temp, jacobian);
+			}
+			DenseMatrix64F finalJac = CommonOps.extract(jacobian, 0, 3, 0, 3);
+			//System.out.println(totalRot);
+			CommonOps.insert(finalJac, totalRot, 0, 3*i);
 		}
-		//System.out.println(totalRot);
-		
 		return totalRot;
 	}
 	
@@ -264,11 +155,11 @@ public class Arm {
 		updateJointPos();
 		//double epsilon = .2;
 		double k = 1;
-		int max_iter = 500;
+		int max_iter = 10000;
 		int curr = 0;
 		int num = 1;
 		if(goal.magnitude() > getLength()*.99){
-			solve(goal.normalize().multiply(getLength()*.98), gl, ep);
+			solve(goal.normalize().multiply(getLength()*.95), gl, ep);
 			return;
 		}
 		
@@ -277,8 +168,7 @@ public class Arm {
 				solve(getEnd(), gl, ep);
 				return;
 			}
-			//solve(getEnd().normalize().multiply(getEnd().magnitude()*1.1), gl, ep);
-			draw(gl);
+			solve(getEnd().normalize().multiply(getEnd().magnitude()*1.1), gl, ep);
 			return;
 		}
 		Point orig = segments.get(numSegments-1).end.add(Point.ZERO);
@@ -300,12 +190,18 @@ public class Arm {
 					return;
 				}
 				num++;
+				/*
 				//draw(gl);
 				for(Joint j : segments){
 					j.rot = j.rot.Perturb(.001);
 					j.makeRotMatrix();
+				}*/
+				for(int i = 0; i < numSegments; i++){
+					segments.get(i).rot = orig_rots.get(i);
+					segments.get(i).makeRotMatrix();
 				}
 				updateJointPos();
+				k /= 2;
 				curr = 0;
 			}
 			curr++;
@@ -325,6 +221,8 @@ public class Arm {
 				return;
 			}
 			//System.out.println(getJacobian());
+			
+			double dist = getEnd().subtract(goal).magnitude();
 			
 			//prolly make in another method
 			for(int i = 0; i < numSegments; i++){

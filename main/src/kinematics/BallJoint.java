@@ -34,37 +34,15 @@ public class BallJoint extends Joint {
 	}
 
 	@Override
-	public DenseMatrix64F getJacobian(Point p, DenseMatrix64F rot){
-		/*
-		DenseMatrix64F temp1 = new DenseMatrix64F(rotMat.numRows, rotMat.numCols);
-		CommonOps.transpose(rotMat, temp1);
-		//Point temp = p.subtract(pos);
-		double[][] temp_arr = new double[][]{{p.getX()},{p.getY()},{p.getZ()}};
-		DenseMatrix64F temp2 = new DenseMatrix64F(temp_arr);
-		DenseMatrix64F temp3 = new DenseMatrix64F(temp_arr);
-		CommonOps.mult(temp1, temp2, temp3);
-		Point temp = new Point(temp3.get(0,0), temp3.get(1,0), temp3.get(2,0));
-		temp = temp.subtract(pos);
-		*/
-		//Point temp = p.subtract(pos);
-		
-		/*
-		CommonOps.transpose(rot);
+	public DenseMatrix64F getJacobian(Point p){
 		Point temp = p;
-		DenseMatrix64F pt = new DenseMatrix64F(3,1);
-		pt.set(0,0,temp.getX());
-		pt.set(1,0,temp.getY());
-		pt.set(2,0,temp.getZ());
-		DenseMatrix64F result = new DenseMatrix64F(3,1);
-		CommonOps.mult(rot, pt, result);
-		temp = new Point(result.get(0), result.get(1), result.get(2));
-		*/
-		//temp = end.subtract(pos);
-		Point temp = end;
 		double[][] pos_array = new double[][]{{0,temp.getZ(),-temp.getY()},
 				{-temp.getZ(),0,temp.getX()},
 				{temp.getY(),-temp.getX(),0}};
-		return new DenseMatrix64F(pos_array);
+		DenseMatrix64F temp1 = new DenseMatrix64F(pos_array);
+		DenseMatrix64F result = CommonOps.identity(4);
+		CommonOps.insert(temp1, result, 0, 0);
+		return result;
 	}
 	
 	@Override

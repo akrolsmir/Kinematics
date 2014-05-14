@@ -13,7 +13,7 @@ public abstract class Joint {
 	public DenseMatrix64F rotMatrix;
 	public double length;
 	
-	public abstract DenseMatrix64F getJacobian(Point p, DenseMatrix64F rot);
+	public abstract DenseMatrix64F getJacobian(Point p);
 	
 	public abstract void makeRotMatrix();
 	
