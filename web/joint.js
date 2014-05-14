@@ -23,16 +23,7 @@ Joint.prototype.update = function(prev) {
   // Recalculate the pos and end based on prev and this.rot
   this.pos = prev ? prev.end : this.pos;
   var x = prev ? $N.mul($N.normal($N.sub(prev.end, prev.pos)), this.length) : [this.length, 0, 0];
-  var theta = $N.norm2(this.rot);
-  if (theta == 0) {
-    this.end = x;
-  } else {
-    var norm = $N.normal(this.rot);
-    this.end = $N.add($N.mul(norm, $N.dot(norm, x)),
-      $N.mul($N.cross(norm, x), Math.sin(theta)),
-      $N.mul($N.cross(norm, $N.cross(norm, x)), -Math.cos(theta)));
-  }
-  $N.addeq(this.end, this.pos);
+  this.end = $N.add(this.pos, $N.dot(this.rotationMatrix(), x));
 }
 
 Joint.prototype.show = function() {
@@ -42,8 +33,8 @@ Joint.prototype.show = function() {
   this.geometry.verticesNeedUpdate = true;
 }
 
-Joint.prototype.jacobianMatrix = function() {
-  return crossMatrix($N.sub([0, 0, 0], this.end));
+Joint.prototype.jacobianMatrix = function(trans, end) {
+  return crossMatrix($N.dot($N.transpose(trans), $N.sub(this.pos, this.end)));
 }
 
 Joint.prototype.rotationMatrix = function() {
@@ -57,5 +48,5 @@ Joint.prototype.rotationMatrix = function() {
 function crossMatrix(v) {
   return [[0, -v[2], v[1]],
           [v[2], 0, -v[0]],
-          [-v[2], v[1], 0]];
+          [-v[1], v[0], 0]];
 }

@@ -31,7 +31,7 @@ function zoom() {
 
 // Moves the arm closer to goal. Returns the length of dr.
 function approach(arm, goal) {
-  // calculate endpoints
+  // Calculate endpoints
   arm[0].update();
   for (var i = 1; i < arm.length; i++) {
     arm[i].update(arm[i - 1]);
@@ -42,10 +42,10 @@ function approach(arm, goal) {
   if($N.norm2(dist) > 0.01) {
     // update rots for next render loop
     var rotMats = [$N.identity(3)];
-    var jcbMats = [arm[0].jacobianMatrix()];
+    var jcbMats = [arm[0].jacobianMatrix(rotMats[0], arm[arm.length - 1].end)];
     for(var i = 1; i < arm.length; i++) {
       rotMats.push($N.dot(rotMats[i - 1], arm[i].rotationMatrix()));
-      jcbMats.push($N.dot(rotMats[i], arm[i].jacobianMatrix()));
+      jcbMats.push($N.dot(rotMats[i], arm[i].jacobianMatrix(rotMats[i], arm[arm.length - 1].end)));
     }
     var j = $N.concat(jcbMats);
     // var jPlus = $N.dot($N.transpose(j), $N.inv($N.dot(j, $N.transpose(j))));
@@ -63,9 +63,6 @@ function approach(arm, goal) {
       $N.addeq(arm[i].rot, dr.slice(3 * i, 3 * (i + 1)));
     }
   }
-  if($N.norm2(dr) == 0) {
-    console.log("out of reach?");
-  }
   return $N.norm2(dr);
 }
 var damp = 20;
@@ -82,7 +79,7 @@ var goal = [2, 1, 1];
 var alerted = false;
 
 function moveGoal() {
-  angle += 0.015;
+  angle += 0.010;
   goal = [8 * Math.sin(0.5 * angle), 4 * Math.sin(angle), 0];
   oct.position = new THREE.Vector3().fromArray(goal);
   frame.position = oct.position;
