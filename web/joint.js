@@ -9,14 +9,12 @@ function Joint(length, rot) {
     color: 0x0000ff
   });
 
-  var geometry = new THREE.Geometry();
-  geometry.vertices.push(new THREE.Vector3().fromArray(this.pos));
-  geometry.vertices.push(new THREE.Vector3().fromArray(this.end));
+  this.geometry = new THREE.Geometry();
+  this.geometry.vertices.push(new THREE.Vector3().fromArray(this.pos));
+  this.geometry.vertices.push(new THREE.Vector3().fromArray(this.end));
 
-  var line = new THREE.Line( geometry, material );
-  scene.add( line );
-
-  this.geometry = geometry;
+  this.line = new THREE.Line( this.geometry, material );
+  scene.add( this.line );
 }
 
 Joint.prototype.update = function(prev) {

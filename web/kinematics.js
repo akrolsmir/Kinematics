@@ -1,9 +1,9 @@
 var scene = new THREE.Scene();
 var camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
 
-var renderer = new THREE.WebGLRenderer();
-renderer.setSize(window.innerWidth, window.innerHeight);
-document.body.appendChild(renderer.domElement);
+var renderer = new THREE.WebGLRenderer({canvas: canvas1});
+renderer.setSize(window.innerWidth / 2, window.innerHeight / 2);
+// document.body.appendChild(renderer.domElement);
 
 camera.position.z = 5;
 
@@ -11,6 +11,11 @@ var render = function () {
   requestAnimationFrame(render);
 
   moveGoal();
+  // Display the goal
+  oct.position = new THREE.Vector3().fromArray(goal);
+  frame.position = oct.position;
+  oct.rotation.y += 0.1;
+  frame.rotation.y += 0.1;
 
   if(stick)
     zoom();
@@ -76,15 +81,16 @@ scene.add( frame );
 
 var angle = 0;
 var goal = [2, 1, 1];
-var alerted = false;
 
 function moveGoal() {
   angle += 0.010;
   goal = [8 * Math.sin(0.5 * angle), 4 * Math.sin(angle), 0];
-  oct.position = new THREE.Vector3().fromArray(goal);
-  frame.position = oct.position;
-  oct.rotation.y += 0.1;
-  frame.rotation.y += 0.1;
+}
+
+function resetArm() {
+  for(var i = 0; i < arm.length; i++) {
+    scene.remove(arm[i].line);
+  }
 }
 
 // Set up the arm and render everything
