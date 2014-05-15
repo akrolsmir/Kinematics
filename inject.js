@@ -6,7 +6,10 @@ function inject() {
   node.removeChild(script);
   script = document.createElement("script");
   script.type = "text/javascript";
-  var textnode = document.createTextNode(document.getElementById("text").value);
+  var textnode = document.createTextNode(myCodeMirror.getValue());
   script.appendChild(textnode);
   node.appendChild(script);
 }
+
+var myTextArea = document.getElementById('text');
+var myCodeMirror = CodeMirror.fromTextArea(myTextArea);
