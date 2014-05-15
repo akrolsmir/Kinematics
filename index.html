@@ -44,11 +44,39 @@
 
 <p>This uses the <a href="http://threejs.org/">three.js</a> library as a wrapper around WebGL and the <a href="http://www.numericjs.com/">Numeric</a> library for math.</p>
 
+<canvas id='canvas1' width="500" height="500"></canvas>
+<textarea id="text" style="width: 100%; height: 280px;">
+// Set up the arm
+resetArm();
+var joint1 = new Joint(1, [0, 0, 0]);
+var joint2 = new Joint(3, [0, 0, 1.57]);
+var joint3 = new Joint(2, [3, 0, 0]);
+var joint4 = new Joint(1, [0.5, 0.2, 1.0]);
+var arm = [joint1, joint2, joint3, joint4,];
+
+// Modify the location of the goal
+var angle = 0;
+var goal = [2, 1, 1];
+
+function moveGoal() {
+  angle += 0.010;
+  goal = [8 * Math.sin(0.5 * angle), 4 * Math.sin(angle), 0];
+}
+</textarea>
+<p><button onclick="inject()">Run!</button></p>
+<script src="three.min.js"></script>
+<script src="numeric-1.2.6.min.js"></script>
+<script src="inject.js"></script>
+<script src="joint.js"></script>
+<script src="kinematics.js"></script>
+
 <h2>
 <a name="features" class="anchor" href="#features"><span class="octicon octicon-link"></span></a>Features</h2>
 
 <ul>
-<li>Solving an IK problem of 4 links</li>
+<li>Solving an IK problem of 4 links
+<iframe width="560" height="315" src="//www.youtube-nocookie.com/embed/hCQ8pkvZxAo?rel=0" frameborder="0" allowfullscreen></iframe>
+</li>
 <li>Robustness to out-of-reach solutions</li>
 </ul>
         </section>
